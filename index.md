@@ -90,7 +90,7 @@ Options is an object and currently only accepts `timeout`. A `timeout` of zero m
 
 Again, same thing for options. `timeout` set for this block only. blocks may be asynchronous. Tests are run synchronously, waiting for complete resolution of asynchronous code. In the future, files will be run in parallel, with tests internally running in series (synchronously).
 
-### `set(keyName, settting)`
+### `set(keyName, setting)`
 `set` is the lazy evaluator. The keyName must be a string, and the setting can be a value, or a function who's result will (eventually) be used as the value.
 eg:
 ```javascript
