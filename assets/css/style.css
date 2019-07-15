@@ -129,6 +129,8 @@
   color: #90a959;
 }
 
+/* local */
+
 body {
   padding: 0px 0 20px 0px;
   margin: 0px;
@@ -238,12 +240,13 @@ code {
   font-family: Fira Code, Fira, Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal, monospace;
   color: #efefef;
   font-size: 13px;
-  margin: 0 4px;
-  padding: 4px 6px;
-  border-radius: 2px;
+  margin: 0 2px;
+  padding: 0;
+  border-radius: 0;
 }
 
 pre {
+  border-radius: 1em;
   padding: 8px 15px;
   background: #191919;
   border-radius: 2px;
@@ -251,14 +254,12 @@ pre {
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, .3);
   overflow: auto;
   overflow-y: hidden;
-
 }
 
 pre code {
-  color: #efefef;
+  border-radius: 2px;
   text-shadow: 0px 1px 0px #000;
   margin: 0;
-  padding: 0;
 }
 
 table {
@@ -357,22 +358,5 @@ screen and (max-width: 720px) {
   #title .credits .right {
     float: none;
     display: block;
-  }
-}
-
-
-@media print,
-screen and (max-width: 480px) {
-
-  #header {
-    margin-top: -20px;
-  }
-
-  section {
-    margin-top: 40px;
-  }
-
-  nav {
-    display: none;
   }
 }
