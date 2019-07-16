@@ -1,4 +1,4 @@
-# JSSPEC
+# JSSpec
 Contextualised spec runner for JavaScript in the flavour of `RSpec` (Ruby Spec runner).
 
 ## Why
@@ -55,7 +55,7 @@ This improves readability and maintainability of the test code. Which in turn im
 ## Limitations
 To provide this capability, the `set` and `subject` variables are defined on the global object. This means you run the risk of breaking the world if you choose the wrong variable names. But I'm sure this will just help you choose better names. ;) In reality, `JSSpec` doesn't allow you to overwrite an existing global variable. This doesn't save you if your application code sets some object on global. Of course, assigning to global in production code is a pretty bad idea anyway.
 
-The ecosystem is not yet complete. The system does not yet have shared contexts or shared examples.
+The ecosystem is not yet complete. The system does not yet have shared contexts.
 
 Eventually there will be an expectation library to complement `JSSpec`. For now, `chai.expect` (or any similar assertion library) works fine.
 
@@ -124,20 +124,20 @@ it('is a thing', () => {
 });
 ```
 ## Hooks
-## `before([description, [options]], block)`
+### `before([description, [options]], block)`
 Define a before block to run before any `it` example block in this context. This includes nested examples. If no examples exit in the context, the `block` provided will not be run.
 
 The `block` has access to lazy values (variables defined by `set` and `subject`), but (just like an example block) the values are reset at the end of the block execution. `before` blocks should be used to set external contexts - such as database entries, or file content - rather than setting variables to be used in the test code.
 
-## `after([description, [options]], block)`
+### `after([description, [options]], block)`
 Define an after block to run after all `it` example block in this context. This includes nested examples. If no examples exit in the context, the `block` provided will not be run.
 
 The `block` has access to lazy values (variables defined by `set` and `subject`), but (just like an example block) the values are reset at the end of the block execution. `after` blocks should be used to tear down external contexts - such as database entries, or file content - rather than doing anything with the test variables.
 
-## `beforeEach([description, [options]], block)`
+### `beforeEach([description, [options]], block)`
 As per before hook, except that it runs before _every_ `it` example block in this context. This included nested examples.
 
-## `afterEach([description, [options]], block)`
+### `afterEach([description, [options]], block)`
 As per before hook, except that it runs before _every_ `it` example block in this context. This included nested examples.
 
 Order of execution:
@@ -196,6 +196,62 @@ after each 1
       ✔︎  executes 3
 after 1
 ```
+
+## Shared examples
+If you have multiple components that require the same tests, you can avoid repeating your test code using `sharedExamples`.
+
+```javascript
+sharedExamples('an iterator', () => {
+  set('target', () => subject[Symbol.iterator]());
+  set('values', undefined);
+
+  it('responds to next', () => {
+    expect(target).to.respondTo('next');
+  });
+
+  it('next has `done`', () => {
+    expect(target.next()).to.include.key('done');
+  });
+
+  context('with two iterable values', () => {
+    set('values', () => twoValues);
+
+    it('gets values back twice, then nothing', () => {
+      expect(target.next()).to.include.key('value');
+      expect(target.next()).to.include.key('value');
+
+      let final = target.next();
+      expect(final.value).to.be.undefined;
+      expect(final.done).to.be.true;
+    });
+  });
+});
+
+describe('Map', () => {
+  subject(() => new Map(values));
+  set('twoValues', [[1, 2], [3, 4]]);
+
+  itBehavesLike('an iterator');
+});
+
+describe('Set', () => {
+  subject(() => new Set(values));
+  set('twoValues', [1, 2]);
+
+  itBehavesLike('an iterator');
+});
+
+describe('String', () => {
+  subject(() => new String(values));
+  set('twoValues', 'ab');
+
+  itBehavesLike('an iterator');
+});
+```
+
+In effect, the `sharedExamples` is invoked as a child context with the `itBehavesLike` call. The examples being called have access to the contexts lazy evaluators, and will trigger `beforeEach` and `afterEach` calls for every Example (`it`) call they contain. `before` and `after` blocks will also be triggered under their normal conditions as though the `sharedExamples` being executed were defined in a child context.
+
+The context that is invoked will have the name `it behaves like [sharedExamples name]`. eg. `it behaves like an iterator` above. You should name your `sharedExamples` accordingly.
 
 ## eslint
 There is an eslint plugin available which removes the 'is not defined' errors for variables defined in `set` and `subject` statements. Install with:
