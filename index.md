@@ -83,12 +83,12 @@ The standard bits:
 `context(description, options, block)` or<br>
 `context(description, block)`
 
-Options is an object and currently only accepts `timeout`. A `timeout` of zero means run forever if it has to. The `timeout` is set for each child example block.
+Options is an object and accepts `timeout` and `random`. A `timeout` of zero means run forever if it has to. The `timeout` is set for each child example block. `random` can be set to `true` to randomise the order of execution of child blocks, or `false` to ensure they run in order. Note that child contexts are always built before their sibling examples are run.
 
 `it(description, options, block)` or<br>
 `it(description, block)`
 
-Again, same thing for options. `timeout` set for this block only. blocks may be asynchronous. Tests are run synchronously, waiting for complete resolution of asynchronous code. In the future, files will be run in parallel, with tests internally running in series (synchronously).
+Options only accpets a `timeout` to set for this block. blocks may be asynchronous. Tests are run synchronously, waiting for complete resolution of asynchronous code. In the future, files will be run in parallel, with tests internally running in series (synchronously).
 
 ### `set(keyName, setting)`
 `set` is the lazy evaluator. The keyName must be a string, and the setting can be a value, or a function who's result will (eventually) be used as the value.
