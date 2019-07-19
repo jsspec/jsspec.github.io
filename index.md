@@ -196,8 +196,18 @@ after each 1
       ✔︎  executes 3
 after 1
 ```
+## Shared examples and contexts
+Shared examples and shared contexts have similar functionally, but react with the context they are invoked from differently. Both can be provided with a method that accepts arguments, and arguments can be passed when the context/examples are called upon:
 
-## Shared examples
+`sharedExamples(name, block)` is called in with
+`itBehavesLike(name, ...arguments)` where `arguments` could be empty.
+
+`sharedContext(name, block)` is called in with `includeContext(name, ...arguments)` where again, `arguments` could be empty.
+
+Note that `...arguments` indicates a list of arguments, not an array, think of `function.call` vs `function.apply`.
+
+
+### Shared examples
 If you have multiple components that require the same tests, you can avoid repeating your test code using `sharedExamples`.
 
 ```javascript
@@ -252,6 +262,38 @@ describe('String', () => {
 In effect, the `sharedExamples` is invoked as a child context with the `itBehavesLike` call. The examples being called have access to the contexts lazy evaluators, and will trigger `beforeEach` and `afterEach` calls for every Example (`it`) call they contain. `before` and `after` blocks will also be triggered under their normal conditions as though the `sharedExamples` being executed were defined in a child context.
 
 The context that is invoked will have the name `it behaves like [sharedExamples name]`. eg. `it behaves like an iterator` above. You should name your `sharedExamples` accordingly.
+
+### Shared context
+A `sharedContext` is similar to a shared example, except that the provided block is executed as though it was part of the context it is being invoked from. No child context is created. Any values `set` in the shared context block will be available to the block where `includeContext` is called.
+
+Order of operation is important in this case. For example:
+
+```javascript
+sharedContext('changes things', () => {
+  set('value', 1);
+
+  it('has the value set in the sharedContext?', () => expect(value).to.eql(1)); // Fails once, passes once
+});
+
+context('shared after', () => {
+  set('value', 0);
+
+  includeContext('changes things');
+
+  it('has the value set here?', () => expect(value).to.eql(0)); // This will FAIL
+});
+
+context('shared before', () => {
+  includeContext('changes things');
+
+  set('value', 0);
+
+  it('has the value set here?', () => expect(value).to.eql(0)); // This will PASS
+});
+```
+
+As per the comments, the example in the first context will fail because there is a second call to `set` for `value` which isn't accounted for. This is correct operation, but something you need to be careful of. The same is true when running examples imported from the shared context. The example in the shared context will fail when called from the second context block.
+
 
 ## eslint
 There is an eslint plugin available which removes the 'is not defined' errors for variables defined in `set` and `subject` statements. Install with:
