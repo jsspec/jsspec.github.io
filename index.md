@@ -55,26 +55,49 @@ This improves readability and maintainability of the test code. Which in turn im
 ## Limitations
 To provide this capability, the `set` and `subject` variables are defined on the global object. This means you run the risk of breaking the world if you choose the wrong variable names. But I'm sure this will just help you choose better names. ;) In reality, `JSSpec` doesn't allow you to overwrite an existing global variable. This doesn't save you if your application code sets some object on global. Of course, assigning to global in production code is a pretty bad idea anyway.
 
-The ecosystem is not yet complete. The system does not yet have shared contexts.
-
 Eventually there will be an expectation library to complement `JSSpec`. For now, `chai.expect` (or any similar assertion library) works fine.
 
 Some of the output may be wonky, please report it via the `@jsspec/format` repo.
-
-Currently only runs against full path names - either absolute or relative to the current working directory.
 
 ## Command
 ```
 jsspec [options] files
   --random, -R     Flag to run tests in random order. Default: true
                      - thus to turn this off, you have to pass this option twice
-  --format, -f     Output formatter currently only 'documentation' (or 'd' for short)
+  --format, -f     Output formatter:
+                     'documentation' ('d' for short) or
+                     'dot' ('o' for short)
   --require, -r    list of modules to require before executing the tests.
                      - since this takes a list, you have to break out of it before
                        listing your test files
   --files, --      flag to stop processing options and start listing test files.
                      - not needed in most cases
 ```
+
+Files may be listed with targeted line, or indexed examples to run. Note that this should only be done using the summary output from a failed run as, unlike RSpec, no work is done to determine what context or example a line sits within.
+
+Example command lines:
+```bash
+# Run against all `.spec.js` files in the `spec/` directory, ensuring that `expect` from `chai` is available as a global variable
+# note that this requires an escape of some kind before listing the files to run, since it accepts multiple files itself
+jsspec -r chai/register-expect - spec/*.spec.js
+
+# Run specs, in order (not random)
+# note that the need to toggle random on then off is deliberate
+# your spec shouldn't need to run in order to pass(*)
+jsspec --require chai/register-expect -RR spec/*.spec.js
+
+# Use the dot output format
+jsspec -fo spec/*.spec.js
+
+# Run an example from a specific line (as reported in a previously failed run)
+jsspec /my/working/directory/spec/this_failed.spec.js:17 # All tests should pass but this one didn't
+
+# Run an example, that may have come from a loop, or a shared context/example group (as reported in a previously failed run)
+jsspec /my/working/directory/spec/this_failed.spec.js[1:3:4:1] # Turns out this failed too
+```
+
+(*) Sometimes tests need to do things in order, but you should specify this in the context options instead. JSSpec's own specs do this in a few important places.
 
 ## Use
 The standard bits:
