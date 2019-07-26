@@ -76,19 +76,22 @@ jsspec [options] files
 
 Files may be listed with targeted line, or indexed examples to run. Note that this should only be done using the summary output from a failed run as, unlike RSpec, no work is done to determine what context or example a line sits within.
 
+If `files` is omitted, the glob pattern `spec/**/*spec.js` will be used.
+
 Example command lines:
 ```bash
-# Run against all `.spec.js` files in the `spec/` directory, ensuring that `expect` from `chai` is available as a global variable
+# Run against all `spec.js` files in the `spec/` directory, ensuring that `expect` from `chai` is available as a global variable
 # note that this requires an escape of some kind before listing the files to run, since it accepts multiple files itself
-jsspec -r chai/register-expect - spec/*.spec.js
+jsspec -r chai/register-expect - spec/**/*spec.js
 
 # Run specs, in order (not random)
 # note that the need to toggle random on then off is deliberate
 # your spec shouldn't need to run in order to pass(*)
-jsspec --require chai/register-expect -RR spec/*.spec.js
+jsspec --require chai/register-expect -RR spec/**/*spec.js
 
-# Use the dot output format
-jsspec -fo spec/*.spec.js
+# Use the dot output format, and allow babel to pre-compile files
+# can be used to run spec for React
+jsspec --require @babel/register -fo spec/**/*spec.js
 
 # Run an example from a specific line (as reported in a previously failed run)
 jsspec /my/working/directory/spec/this_failed.spec.js:17 # All tests should pass but this one didn't
@@ -98,6 +101,8 @@ jsspec /my/working/directory/spec/this_failed.spec.js[1:3:4:1] # Turns out this 
 ```
 
 (*) Sometimes tests need to do things in order, but you should specify this in the context options instead. JSSpec's own specs do this in a few important places.
+
+In the first three cases above, the `spec/**/*spec.js` could have been omitted, as this is the default.
 
 ## Use
 The standard bits:
