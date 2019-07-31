@@ -62,15 +62,18 @@ Some of the output may be wonky, please report it via the `@jsspec/format` repo.
 ## Command
 ```
 jsspec [options] files
-  --random, -R     Flag to run tests in random order. Default: true
+  --watch,   -w    Flag to run continuously against the supplied files.
+                     - send SIGINT (Ctrl-C) to stop watching and output a
+                       summary (if the selected formatter provides one)
+  --random,  -R    Flag to run tests in random order. Default: true
                      - thus to turn this off, you have to pass this option twice
-  --format, -f     Output formatter:
+  --format,  -f    Output formatter:
                      'documentation' ('d' for short) or
                      'dot' ('o' for short)
   --require, -r    list of modules to require before executing the tests.
                      - since this takes a list, you have to break out of it before
                        listing your test files
-  --files, --      flag to stop processing options and start listing test files.
+  --files,   --    flag to stop processing options and start listing test files.
                      - not needed in most cases
 ```
 
