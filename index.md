@@ -67,6 +67,8 @@ jsspec [options] files
                        summary (if the selected formatter provides one)
   --random,  -R    Flag to run tests in random order. Default: true
                      - thus to turn this off, you have to pass this option twice
+  --seed, -s       Provide a seed number, must be a positive integer. Presence of
+                   this option forces running tests in random order.
   --format,  -f    Output formatter:
                      'documentation' ('d' for short) or
                      'dot' ('o' for short)
@@ -107,6 +109,8 @@ jsspec /my/working/directory/spec/this_failed.spec.js[1:3:4:1] # Turns out this 
 
 In the first three cases above, the `spec/**/*spec.js` could have been omitted, as this is the default.
 
+The pseudo-random number generator (prng) is used for the randomness instead of `Math.random` as the built-in method can not be seeded, and is therefore not repeatable. Flaky tests are often the result of inter-test dependencies. Repeating the circumstances can only be done if the order is repeatable. The prng used is seed-able and thus provides this functionality.
+
 ## Use
 The standard bits:
 
@@ -119,7 +123,7 @@ Options is an object and accepts `timeout` and `random`. A `timeout` of zero mea
 `it(description, options, block)` or<br>
 `it(description, block)`
 
-Options only accpets a `timeout` to set for this block. blocks may be asynchronous. Tests are run synchronously, waiting for complete resolution of asynchronous code. In the future, files will be run in parallel, with tests internally running in series (synchronously).
+Options only accepts a `timeout` to set for this block. blocks may be asynchronous. Tests are run synchronously, waiting for complete resolution of asynchronous code. In the future, files will be run in parallel, with tests internally running in series (synchronously).
 
 ### `set(keyName, setting)`
 `set` is the lazy evaluator. The keyName must be a string, and the setting can be a value, or a function who's result will (eventually) be used as the value.
@@ -131,7 +135,7 @@ eg:
 set('test', 501)
 
 /*
-  other will resolve to the value of `test` when `other` 
+  other will resolve to the value of `test` when `other`
   is first invoked in an example block
 */
 set('other', () => test)
