@@ -70,7 +70,8 @@ jsspec [options] files
   --seed, -s       Provide a seed number, must be a positive integer. Presence of
                    this option forces running tests in random order.
   --format,  -f    Output formatter:
-                     'documentation' ('d' for short) or
+                     'documentation' ('d' for short)
+                     'json' ('j' for short)
                      'dot' ('o' for short)
   --require, -r    list of modules to require before executing the tests.
                      - since this takes a list, you have to break out of it before
